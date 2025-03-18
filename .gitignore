@@ -7,3 +7,4 @@
 # next.js
 /.next/
 /out/
+.npmrc
