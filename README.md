@@ -7,7 +7,7 @@ next.js aws demo
 ## 先决条件
 
 1. 安装 AWS CLI 并配置
-<!-- AWS CLI 是跟 AWS 云服务“对话”的工具。配置它（输入 Access Key、Secret Key、区域等），相当于给电脑一个“通行证”，让它能操作你的 AWS 账户。 -->
+<!-- AWS CLI 是跟 AWS 云服务"对话"的工具。配置它（输入 Access Key、Secret Key、区域等），相当于给电脑一个"通行证"，让它能操作你的 AWS 账户。 -->
    ```bash
    aws configure
    ```
@@ -15,7 +15,7 @@ next.js aws demo
 2. 安装 Node.js (推荐 v18.x 或更高版本)
 
 3. 安装 AWS CDK
-<!-- CDK 是 AWS 的“基础设施代码工具”，让你用代码（而不是手动点网页）建服务器、存储啥的。 -->
+<!-- CDK 是 AWS 的"基础设施代码工具"，让你用代码（而不是手动点网页）建服务器、存储啥的。 -->
    ```bash
    npm install -g aws-cdk
    ```
@@ -43,7 +43,7 @@ cd cdk
 npm install
 
 # 引导 CDK（如果是首次在此 AWS 账户和区域中使用 CDK）
-# 在 AWS 上建个“工具箱”（S3 桶、IAM 角色等），CDK 以后用这个工具箱存临时文件、管理权限。
+# 在 AWS 上建个"工具箱"（S3 桶、IAM 角色等），CDK 以后用这个工具箱存临时文件、管理权限。
 cdk bootstrap
 ```
 
@@ -55,7 +55,7 @@ cdk bootstrap
 cdk diff
 
 # 部署所有堆栈
-# 把 CDK 代码“变成现实”，在 AWS 上建好所有东西（S3 桶、Lambda 函数、CloudFront 分发等）。
+# 把 CDK 代码"变成现实"，在 AWS 上建好所有东西（S3 桶、Lambda 函数、CloudFront 分发等）。
 cdk deploy --all
 ```
 
@@ -78,7 +78,7 @@ cd cdk
 npm run build:lambda
 
 # 更新 Lambda 函数
-# 给 Lambda 函数塞点“配置信息”（比如 S3 桶名、密钥），让它知道去哪儿拿静态文件、咋验证请求。
+# 给 Lambda 函数塞点"配置信息"（比如 S3 桶名、密钥），让它知道去哪儿拿静态文件、咋验证请求。
 # NextJsAwsDemo-NextServer-dev
 # NextJsAwsDemo-ImageOptimizer-dev
 aws lambda update-function-code --function-name YOUR-NEXT-SERVER-FUNCTION-NAME --zip-file fileb://lambda-build/next-server.zip
@@ -88,7 +88,7 @@ aws lambda update-function-code --function-name YOUR-IMAGE-OPTIMIZER-FUNCTION-NA
 ### 5. 配置环境变量
 
 在 CloudFront 分发和 Lambda 函数部署后，更新 Lambda 函数的环境变量：
-<!-- 给 Lambda 函数塞点“配置信息”（比如 S3 桶名、密钥），让它知道去哪儿拿静态文件、咋验证请求。 -->
+<!-- 给 Lambda 函数塞点"配置信息"（比如 S3 桶名、密钥），让它知道去哪儿拿静态文件、咋验证请求。 -->
 <!-- YOUR-SECRET-KEY: 19c+XT87FclzV0IeKdR/30DYV2wOIbqI9mJ6YZ9FJV8= -->
 ```bash
 aws lambda update-function-configuration \
@@ -111,7 +111,7 @@ https://YOUR-DISTRIBUTION-DOMAIN-NAME
 ## 其他常用命令
 
 ### 列出所有堆栈
-<!-- 列出 CDK 项目里有哪些“建筑”（堆栈），比如核心服务、数据库啥的。 -->
+<!-- 列出 CDK 项目里有哪些"建筑"（堆栈），比如核心服务、数据库啥的。 -->
 ```bash
 cdk list
 ```
@@ -145,9 +145,45 @@ aws cloudfront create-invalidation --distribution-id YOUR-DISTRIBUTION-ID --path
 
 <!-- 简单理解 -->
 <!-- 
-准备工具：装好 AWS CLI、Node.js、CDK，调好“遥控器”。
-打包应用：把 Next.js 网站“炒好菜”。
-搭框架：用 CDK 在 AWS 上建“厨房”（S3、Lambda、CloudFront）。
-送货：把静态文件和代码送到“云端”。
-调味：给 Lambda 加点“佐料”（环境变量）。
-开张：访问域名，看看“餐厅”能不能营业。 -->
+准备工具：装好 AWS CLI、Node.js、CDK，调好"遥控器"。
+打包应用：把 Next.js 网站"炒好菜"。
+搭框架：用 CDK 在 AWS 上建"厨房"（S3、Lambda、CloudFront）。
+送货：把静态文件和代码送到"云端"。
+调味：给 Lambda 加点"佐料"（环境变量）。
+开张：访问域名，看看"餐厅"能不能营业。 -->
+
+
+
+cdk/
+  ├── bin/             # CDK应用入口点
+  ├── lib/             # CDK构造和堆栈定义
+  │   ├── core-stack.ts           # 核心资源
+  │   ├── isr-stack.ts            # ISR功能
+  │   ├── warmer-stack.ts         # Lambda预热
+  │   └── cloudwatch-stack.ts     # 监控和警报
+  ├── lambda/          # Lambda函数源代码
+  │   ├── revalidation/           # 用于ISR的重新验证
+  │   └── warmer/                 # 用于Lambda预热
+  ├── lambda-build/    # 构建的Lambda函数
+  ├── next-deploy/     # Next.js应用构建输出
+  ├── node_modules/    # Node.js依赖
+  ├── package.json     # 项目依赖和脚本
+  ├── tsconfig.json    # TypeScript配置
+  └── serverless-next-handler.js  # Next.js的Lambda处理程序
+```
+
+┌─────────────────┐     ┌───────────────┐     ┌─────────────────┐
+│                 │     │               │     │                 │
+│  Core Stack     │────▶│  ISR Stack    │────▶│  Warmer Stack   │
+│                 │     │               │     │                 │
+└────────┬────────┘     └───────┬───────┘     └────────┬────────┘
+         │                      │                      │
+         │                      │                      │
+         └──────────────┬──────┴──────────────────────┘
+                        │
+                        ▼
+               ┌─────────────────┐
+               │                 │
+               │ CloudWatch Stack│
+               │                 │
+               └─────────────────┘

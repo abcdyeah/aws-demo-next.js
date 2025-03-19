@@ -8,6 +8,11 @@ import * as events from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import * as path from 'path';
 
+// 在lib/isr-stack.ts中定义，处理Next.js的增量静态再生功能：
+// 1. 缓存存储桶
+// 2. 重新验证队列 (SQS)
+// 3. 重新验证Lambda函数
+// 4. 标签路径映射表 (DynamoDB)
 interface IsrStackProps extends cdk.StackProps {
   appName: string;
   stage: string;

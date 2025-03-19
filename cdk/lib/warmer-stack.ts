@@ -6,6 +6,10 @@ import * as targets from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as path from 'path';
 
+// 在lib/warmer-stack.ts中定义，负责保持Lambda函数温暖以减少冷启动时间：
+// 1. 预热器Lambda函数
+// 2. EventBridge规则 (用于定时触发预热)
+
 interface WarmerStackProps extends cdk.StackProps {
   appName: string;
   stage: string;

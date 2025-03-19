@@ -9,6 +9,13 @@ import * as wafv2 from 'aws-cdk-lib/aws-wafv2';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as path from 'path';
 
+
+// 在lib/core-stack.ts中定义，负责处理基本的AWS资源：
+// 1. Amazon S3 存储桶 (用于静态资源)
+// 2. CloudFront 分发
+// 3. Lambda 函数 (用于Next.js服务器端渲染)
+// 4. 图像优化Lambda函数
+
 export interface CoreStackProps extends cdk.StackProps {
   appName: string;
   stage: string;

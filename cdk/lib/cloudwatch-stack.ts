@@ -6,6 +6,13 @@ import * as sns from 'aws-cdk-lib/aws-sns';
 import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
 import * as iam from 'aws-cdk-lib/aws-iam';
 
+// CloudWatch监控组件 (CloudWatch Stack)
+// 在lib/cloudwatch-stack.ts中定义，设置监控和警报：
+// 1. 监控Next.js服务器函数
+// 2. 监控图像优化函数
+// 3. 监控CloudFront分发
+// 4. 监控重新验证函数
+// 5. 监控预热器函数
 interface CloudWatchStackProps extends cdk.StackProps {
   appName: string;
   stage: string;
