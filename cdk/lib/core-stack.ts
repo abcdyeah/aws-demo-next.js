@@ -38,7 +38,7 @@ export class CoreStack extends cdk.Stack {
         functionName: `${props.appName}-NextServer-${props.stage}`,
         runtime: lambda.Runtime.NODEJS_18_X,
         handler: 'index.handler',
-        code: lambda.Code.fromAsset(path.join(__dirname, '../../.next/serverless')), // 假设已经构建了Next.js应用
+        code: lambda.Code.fromAsset(path.join(__dirname, '../../.next/server')), // 假设已经构建了Next.js应用
         memorySize: 1024,
         timeout: cdk.Duration.seconds(30),
         environment: {
@@ -57,7 +57,7 @@ export class CoreStack extends cdk.Stack {
         functionName: `${props.appName}-ImageOptimizer-${props.stage}`,
         runtime: lambda.Runtime.NODEJS_18_X,
         handler: 'index.handler',
-        code: lambda.Code.fromAsset(path.join(__dirname, '../../.next/serverless')), // 相同代码，不同处理器
+        code: lambda.Code.fromAsset(path.join(__dirname, '../../.next/server')), // 相同代码，不同处理器
         memorySize: 1024,
         timeout: cdk.Duration.seconds(30),
         environment: {

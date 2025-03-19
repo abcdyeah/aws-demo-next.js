@@ -8,3 +8,7 @@
 /.next/
 /out/
 .npmrc
+
+# cdk
+/cdk/cdk.out
+/cdk.out

@@ -1,4 +1,3 @@
-// cdk/lib/cloudwatch-stack.ts
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
@@ -51,9 +50,8 @@ export class CloudWatchStack extends cdk.Stack {
     ];
 
     // 为每个Lambda函数创建监控面板
-    lambdaFunctions.forEach((func) => {
-      // 创建错误警报
-      const errorAlarm = new cloudwatch.Alarm(this, `${func.functionName}ErrorAlarm`, {
+    lambdaFunctions.forEach((func, index) => {
+      const errorAlarm = new cloudwatch.Alarm(this, `LambdaErrorAlarm${index}`, {
         alarmName: `${func.functionName}-Errors-${props.stage}`,
         metric: func.metricErrors(),
         threshold: 5,
@@ -61,9 +59,9 @@ export class CloudWatchStack extends cdk.Stack {
         comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_THRESHOLD,
         treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       });
-
+    
       // 创建调用时间警报
-      const durationAlarm = new cloudwatch.Alarm(this, `${func.functionName}DurationAlarm`, {
+      const durationAlarm = new cloudwatch.Alarm(this, `LambdaDurationAlarm${index}`, {
         alarmName: `${func.functionName}-Duration-${props.stage}`,
         metric: func.metricDuration(),
         threshold: 3000, // 3秒

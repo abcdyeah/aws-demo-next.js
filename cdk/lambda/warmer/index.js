@@ -1,6 +1,6 @@
 // cdk/lambda/warmer/index.js
 const AWS = require('aws-sdk');
-const lambda = new AWS.Lambda();
+const lambdaClient = new AWS.Lambda();
 
 /**
  * Lambda函数用于定期预热Next.js服务器函数

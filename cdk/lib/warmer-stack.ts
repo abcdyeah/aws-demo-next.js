@@ -1,4 +1,3 @@
-// cdk/lib/warmer-stack.ts
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
@@ -76,7 +75,7 @@ export class WarmerStack extends cdk.Stack {
       description: 'Warmer Lambda Function Name',
     });
 
-    new cdk.CfnOutput(this, 'WarmerSchedule', {
+    new cdk.CfnOutput(this, 'WarmerScheduleRuleName', {
       value: eventRule.ruleName,
       description: 'Warmer Schedule Rule Name',
     });
