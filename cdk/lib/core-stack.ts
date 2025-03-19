@@ -127,19 +127,19 @@ export class CoreStack extends cdk.Stack {
             cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
           },
           '/_next/image/*': {
-            origin: new origins.HttpOrigin(imageOptimizerFunctionUrl.url),
+            origin: new origins.HttpOrigin(imageOptimizerFunctionUrl.url.replace(/^https?:\/\//, '')), // 去掉协议部分
             viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
             cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
           },
           '/api/*': {
-            origin: new origins.HttpOrigin(nextServerFunctionUrl.url),
+            origin: new origins.HttpOrigin(nextServerFunctionUrl.url.replace(/^https?:\/\//, '')), // 去掉协议部分
             viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
             cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
           },
           '/*': {
-            origin: new origins.HttpOrigin(nextServerFunctionUrl.url),
+            origin: new origins.HttpOrigin(nextServerFunctionUrl.url.replace(/^https?:\/\//, '')), // 去掉协议部分
             viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
             cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
