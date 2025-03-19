@@ -9,7 +9,8 @@ const nextConfig = {
   experimental: {
     // 启用AWS Lambda集成的相关配置
     outputFileTracing: true,
-  }
+  },
+  output: 'standalone',
 };
 
 module.exports = nextConfig;

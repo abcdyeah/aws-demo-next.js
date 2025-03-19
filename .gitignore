@@ -1,14 +1,60 @@
-# dependencies
-/node_modules
-/dist
-/cdk/node_modules
-/cdk/dist
+# 依赖
+node_modules/
+**/node_modules/
 
-# next.js
-/.next/
-/out/
+# cdk 目录下需要忽略的内容
+/cdk/node_modules/
+/cdk/*.zip
+/cdk/lambda-build/
+/cdk/next-deploy/
+/cdk/.DS_Store
+
+# 构建输出
+.next/
+out/
+build/
+dist/
+cdk.out/
+
+# 部署和临时文件
+lambda-build/
+next-deploy/
+*.zip
+*.lambda
+
+# 环境和敏感信息
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+aws-exports.js
+
+# 日志
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 调试文件
+debug-*.js
+debug-*.zip
+**/simple-handler.js
+**/minimal-handler.js
+
+# 系统和编辑器
+.DS_Store
+**/.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+Thumbs.db
+
+# 缓存
+.cache/
+.turbo/
+.eslintcache
+
+# npm 配置
 .npmrc
-
-# cdk
-/cdk/cdk.out
-/cdk.out

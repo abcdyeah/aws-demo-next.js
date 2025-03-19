@@ -63,6 +63,7 @@ cdk deploy --all
 
 执行部署后，CDK 将输出 S3 Asset Bucket 的名称。使用以下命令将 Next.js 静态文件上传到 S3：
 <!-- 把 Next.js 打包好的静态文件（图片、CSS、JS）上传到 S3 桶，供 CloudFront 分发给用户。 -->
+<!-- nextjsawsdemo-assets-dev-396913700129 -->
 ```bash
 cd ..
 aws s3 sync .next/static s3://YOUR-ASSET-BUCKET-NAME/_next/static/
@@ -78,6 +79,8 @@ npm run build:lambda
 
 # 更新 Lambda 函数
 # 给 Lambda 函数塞点“配置信息”（比如 S3 桶名、密钥），让它知道去哪儿拿静态文件、咋验证请求。
+# NextJsAwsDemo-NextServer-dev
+# NextJsAwsDemo-ImageOptimizer-dev
 aws lambda update-function-code --function-name YOUR-NEXT-SERVER-FUNCTION-NAME --zip-file fileb://lambda-build/next-server.zip
 aws lambda update-function-code --function-name YOUR-IMAGE-OPTIMIZER-FUNCTION-NAME --zip-file fileb://lambda-build/image-optimizer.zip
 ```
@@ -86,10 +89,15 @@ aws lambda update-function-code --function-name YOUR-IMAGE-OPTIMIZER-FUNCTION-NA
 
 在 CloudFront 分发和 Lambda 函数部署后，更新 Lambda 函数的环境变量：
 <!-- 给 Lambda 函数塞点“配置信息”（比如 S3 桶名、密钥），让它知道去哪儿拿静态文件、咋验证请求。 -->
+<!-- YOUR-SECRET-KEY: 19c+XT87FclzV0IeKdR/30DYV2wOIbqI9mJ6YZ9FJV8= -->
 ```bash
 aws lambda update-function-configuration \
   --function-name YOUR-NEXT-SERVER-FUNCTION-NAME \
   --environment "Variables={ASSET_BUCKET_NAME=YOUR-ASSET-BUCKET-NAME,REVALIDATION_SECRET=YOUR-SECRET-KEY}"
+
+aws lambda update-function-configuration \
+  --function-name NextJsAwsDemo-NextServer-dev \
+  --environment "Variables={ASSET_BUCKET_NAME=nextjsawsdemo-assets-dev-396913700129,REVALIDATION_SECRET=19c+XT87FclzV0IeKdR/30DYV2wOIbqI9mJ6YZ9FJV8=}"
 ```
 
 ### 6. 验证部署
