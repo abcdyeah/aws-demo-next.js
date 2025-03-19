@@ -6,6 +6,7 @@ import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as wafv2 from 'aws-cdk-lib/aws-wafv2';
+import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as path from 'path';
 
 export interface CoreStackProps extends cdk.StackProps {
@@ -47,11 +48,6 @@ export class CoreStack extends cdk.Stack {
         },
       });
   
-      // 添加Function URL
-      const nextServerFunctionUrl = nextServerFunction.addFunctionUrl({
-        authType: lambda.FunctionUrlAuthType.NONE,
-      });
-  
       // 创建图像优化Lambda函数
       const imageOptimizerFunction = new lambda.Function(this, 'ImageOptimizerFunction', {
         functionName: `${props.appName}-ImageOptimizer-${props.stage}`,
@@ -66,14 +62,26 @@ export class CoreStack extends cdk.Stack {
         },
       });
   
-      // 添加Function URL
-      const imageOptimizerFunctionUrl = imageOptimizerFunction.addFunctionUrl({
-        authType: lambda.FunctionUrlAuthType.NONE,
-      });
-  
       // 允许Lambda函数访问S3
       assetBucket.grantReadWrite(nextServerFunction);
       assetBucket.grantReadWrite(imageOptimizerFunction);
+  
+      // 创建API Gateway作为Lambda函数的代理
+      const nextServerApi = new apigateway.LambdaRestApi(this, 'NextServerApi', {
+        handler: nextServerFunction,
+        proxy: true,
+        deployOptions: {
+          stageName: props.stage,
+        },
+      });
+
+      const imageOptimizerApi = new apigateway.LambdaRestApi(this, 'ImageOptimizerApi', {
+        handler: imageOptimizerFunction,
+        proxy: true,
+        deployOptions: {
+          stageName: props.stage,
+        },
+      });
   
       // 创建WAF Web ACL
       const webAcl = new wafv2.CfnWebACL(this, 'WebAcl', {
@@ -111,7 +119,7 @@ export class CoreStack extends cdk.Stack {
         zoneName: 'example.com', // 替换为实际的域名
       });
   
-      // 创建CloudFront分配
+      // 创建CloudFront分配，使用API Gateway作为源
       const distribution = new cloudfront.Distribution(this, 'Distribution', {
         defaultBehavior: {
           origin: new origins.S3Origin(assetBucket),
@@ -127,19 +135,19 @@ export class CoreStack extends cdk.Stack {
             cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
           },
           '/_next/image/*': {
-            origin: new origins.HttpOrigin(imageOptimizerFunctionUrl.url.replace(/^https?:\/\//, '')), // 去掉协议部分
+            origin: new origins.RestApiOrigin(imageOptimizerApi),
             viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
             cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
           },
           '/api/*': {
-            origin: new origins.HttpOrigin(nextServerFunctionUrl.url.replace(/^https?:\/\//, '')), // 去掉协议部分
+            origin: new origins.RestApiOrigin(nextServerApi),
             viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
             cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
           },
           '/*': {
-            origin: new origins.HttpOrigin(nextServerFunctionUrl.url.replace(/^https?:\/\//, '')), // 去掉协议部分
+            origin: new origins.RestApiOrigin(nextServerApi),
             viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
             cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
@@ -177,6 +185,16 @@ export class CoreStack extends cdk.Stack {
       new cdk.CfnOutput(this, 'AssetBucketName', {
         value: assetBucket.bucketName,
         description: 'S3 Asset Bucket Name',
+      });
+
+      new cdk.CfnOutput(this, 'NextServerApiUrl', {
+        value: nextServerApi.url,
+        description: 'Next.js Server API URL',
+      });
+
+      new cdk.CfnOutput(this, 'ImageOptimizerApiUrl', {
+        value: imageOptimizerApi.url,
+        description: 'Image Optimizer API URL',
       });
     }
   }
